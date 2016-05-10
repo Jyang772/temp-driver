@@ -47,7 +47,7 @@
 
 static struct usb_driver t_driver;
 static struct usb_device *t_device;
-static unsigned char bulk_buf[MAX_PKT_SIZE];
+//static unsigned char bulk_buf[MAX_PKT_SIZE];
 
 struct usb_t {
 	struct usb_device *udev;
@@ -72,8 +72,9 @@ static struct usb_device_id t_table[] = {
 
 //Callbacks
 static void t_int_in_callback(struct urb *urb) {
-	printk("CALLBACK!\n");
+	
 	struct usb_t *dev = urb->context;
+	printk("CALLBACK!\n");
 	printk("Buffer(callback): ");
 	int i;
 	for(i=0; i<4; i++)
@@ -85,7 +86,7 @@ static void t_int_in_callback(struct urb *urb) {
 
 static void t_ctrl_callback(struct urb *urb)
 {
-	struct usb_ml *dev = urb->context;
+	//struct usb_ml *dev = urb->context;
 }
 
 static inline void t_delete(struct usb_t *dev)
@@ -148,21 +149,21 @@ exit:
 	return retval;
 }
 
-static int t_read(struct file *file, char __user *buf, size_t count, loff_t *off) {
+static ssize_t t_read(struct file *file, char __user *buf, size_t count, loff_t *off) {
 
 	printk("Read from device\n");
 	int retval;
-	int read_cnt;
+	//int read_cnt;
 
 	struct usb_t *dev = NULL;
 	dev = file->private_data;
 
-	usb_submit_urb(dev->int_in_urb, GFP_KERNEL);	
+	retval = usb_submit_urb(dev->int_in_urb, GFP_KERNEL);	
 	msleep(100);
 	int i;
 	if (copy_to_user(buf, dev->int_in_buffer, 8))
 			return -EFAULT;
-	
+
 	for(i=0; i<4; i++)
 		printk("%02x",dev->int_in_buffer[i]);
 	printk("\n");
@@ -171,15 +172,14 @@ static int t_read(struct file *file, char __user *buf, size_t count, loff_t *off
 		printk("submitting int urb failed (%d)", retval);
 		dev->int_in_running = 0;
 	}
-
-	return MIN(count, read_cnt);
+	return MIN(count, sizeof(dev->int_in_buffer));
 }
 
-static int t_write(struct file *file, const char __user *user_buf, size_t cnt, loff_t *ppos) {
+static ssize_t t_write(struct file *file, const char __user *user_buf, size_t cnt, loff_t *ppos) {
 
 	printk("Write to device\n");
 	
-	int wrote_cnt = MIN(cnt, MAX_PKT_SIZE);
+	//int wrote_cnt = MIN(cnt, MAX_PKT_SIZE);
 	struct usb_t *dev;
 	int retval = 0;
 
@@ -243,8 +243,10 @@ static int t_probe(struct usb_interface *interface, const struct usb_device_id *
 		
 		if(endpoint->bEndpointAddress == 0x81)
 			return -1;
-		if(((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN) && ((endpoint->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK) == USB_ENDPOINT_XFER_INT)) dev->int_in_endpoint = endpoint;
-	printk("ENDPOINT: %08x\n", endpoint->bEndpointAddress);
+		if(((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN) && 
+			((endpoint->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK) == USB_ENDPOINT_XFER_INT)) 
+			dev->int_in_endpoint = endpoint;
+			printk("ENDPOINT: %08x\n", endpoint->bEndpointAddress);
 	}
 
 		
@@ -300,7 +302,7 @@ static int t_probe(struct usb_interface *interface, const struct usb_device_id *
 
 	dev->minor = interface->minor;
 
-exit:
+//exit:
 	printk("PROBE SUCCESS\n");
 	return retval;
 

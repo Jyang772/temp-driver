@@ -272,7 +272,6 @@ static int t_probe(struct usb_interface *interface, const struct usb_device_id *
 	dev->ctrl_dr->wIndex = cpu_to_le16(T_CTRL_INDEX);
 	dev->ctrl_dr->wLength = cpu_to_le16(T_CTRL_BUFFER_SIZE);
 
-	//char question[] = { 0x01, 0x80, 0x33, 0x01, 0x00, 0x00, 0x00, 0x00 };
 	usb_fill_control_urb(dev->ctrl_urb, dev->udev,
 			usb_sndctrlpipe(dev->udev, 0),
 			(unsigned char *)dev->ctrl_dr,

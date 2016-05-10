@@ -1,0 +1,5 @@
+module="temper"
+
+rmmod usbhid
+rmmod driver
+rm -f /dev/${module}[0-3]

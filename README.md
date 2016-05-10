@@ -1,2 +1,3 @@
-# temp-driver
-TEMPer Linux Loadable Kernel Driver
+# driver
+
+Linux USB kernel driver for the TEMPer USB thermometer. Because it doesn't come with drivers for Linux...

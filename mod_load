@@ -1,0 +1,16 @@
+#!/bin/sh
+module="testdrv"
+device="testdrv"
+mode="664"
+
+#$* for module parameters
+/sbin/insmod ./$module.ko $* || exit 1
+
+#remove stale nodes
+rm -f /dev/${device}[0-1]
+
+#Assuming only one device named testdrv in list -- one major number
+major = $(awk -v mod=$module '$2 == mod {print $1}' /proc/devices)
+mknod /dev/${device}0 c $major 0
+
+

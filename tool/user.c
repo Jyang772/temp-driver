@@ -130,7 +130,7 @@ int main( int argc, char **argv) {
 
 	fd = open(dev,O_RDWR);
      do {
-		write(fd,tempQ,1);
+		write(fd,tempQ,sizeof(tempQ));
 		read(fd,&buffer,BUF_SIZE);
 		tempc = (buffer[3] & 0xFF) + (buffer[2] << 8);
 		tempc *= (125.0 / 32000.0);

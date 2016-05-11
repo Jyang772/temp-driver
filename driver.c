@@ -184,9 +184,8 @@ static ssize_t t_write(struct file *file, const char __user *user_buf, size_t cn
 	int retval = 0;
 
 	dev = file->private_data;
-	
 	u8 buf[8];
-	copy_from_user(buf,user_buf,sizeof(buf));
+	copy_from_user(buf,user_buf,cnt);
 //Easier way is to use usb_control_msg	
 /*	retval = usb_control_msg(dev->udev,
 			usb_sndctrlpipe(dev->udev, 0),
@@ -204,7 +203,7 @@ static ssize_t t_write(struct file *file, const char __user *user_buf, size_t cn
 		printk("usb_control_msg failed (%d)", retval);
 	}
 	
-	return retval;
+	return MIN(cnt,sizeof(dev->ctrl_buffer));
 }
 
 static struct file_operations t_fops = {

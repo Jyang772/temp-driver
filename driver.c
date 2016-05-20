@@ -161,7 +161,7 @@ static ssize_t t_read(struct file *file, char __user *buf, size_t count, loff_t 
 	retval = usb_submit_urb(dev->int_in_urb, GFP_KERNEL);	
 	msleep(100);
 	int i;
-	if (copy_to_user(buf, dev->int_in_buffer, 8))
+	if (copy_to_user(buf, dev->int_in_buffer, sizeof(dev->int_in_buffer)))
 			return -EFAULT;
 
 	for(i=0; i<4; i++)

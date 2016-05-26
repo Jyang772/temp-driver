@@ -47,7 +47,6 @@
 
 static struct usb_driver t_driver;
 static struct usb_device *t_device;
-//static unsigned char bulk_buf[MAX_PKT_SIZE];
 
 struct usb_t {
 	struct usb_device *udev;
@@ -139,6 +138,24 @@ static int t_open(struct inode *inode, struct file *file) {
 			dev->int_in_endpoint->bInterval);
 
 	dev->int_in_running = 1;
+
+	dev->ctrl_dr->bRequestType = T_CTRL_REQUEST_TYPE;
+	dev->ctrl_dr->bRequest = T_CTRL_REQUEST;
+	dev->ctrl_dr->wValue = cpu_to_le16(T_CTRL_VALUE);
+	dev->ctrl_dr->wIndex = cpu_to_le16(T_CTRL_INDEX);
+	dev->ctrl_dr->wLength = cpu_to_le16(T_CTRL_BUFFER_SIZE);
+
+	usb_fill_control_urb(dev->ctrl_urb, dev->udev,
+			usb_sndctrlpipe(dev->udev, 0),
+			(unsigned char *)dev->ctrl_dr,
+			dev->ctrl_buffer,
+			T_CTRL_BUFFER_SIZE,
+			t_ctrl_callback,
+			dev);
+
+
+
+
 	//mb();
 
 	/* Save our object in the file's private structure. */
@@ -253,20 +270,12 @@ static int t_probe(struct usb_interface *interface, const struct usb_device_id *
 	dev->int_in_buffer = kmalloc(int_end_size, GFP_KERNEL);
 	
 	dev->int_in_urb = usb_alloc_urb(0, GFP_KERNEL);
-/*
-        usb_fill_int_urb(dev->int_in_urb, dev->udev,
-                        usb_rcvintpipe(dev->udev,
-                                       dev->int_in_endpoint->bEndpointAddress),
-                        dev->int_in_buffer,
-                        le16_to_cpu(dev->int_in_endpoint->wMaxPacketSize),
-                        t_int_in_callback,
-                        dev,
-                        dev->int_in_endpoint->bInterval);
-*/
+
 	dev->ctrl_urb = usb_alloc_urb(0,GFP_KERNEL);
+
 	dev->ctrl_buffer = kmalloc(8,GFP_KERNEL);
         dev->ctrl_dr = kmalloc(sizeof(struct usb_ctrlrequest), GFP_KERNEL);
-
+/*
 	dev->ctrl_dr->bRequestType = T_CTRL_REQUEST_TYPE;
 	dev->ctrl_dr->bRequest = T_CTRL_REQUEST;
 	dev->ctrl_dr->wValue = cpu_to_le16(T_CTRL_VALUE);
@@ -280,7 +289,7 @@ static int t_probe(struct usb_interface *interface, const struct usb_device_id *
 			T_CTRL_BUFFER_SIZE,
 			t_ctrl_callback,
 			dev);
-
+*/
 	/* Retrieve a serial. */
 	if (! usb_string(udev, udev->descriptor.iSerialNumber,
 			 dev->serial_number, sizeof(dev->serial_number))) {

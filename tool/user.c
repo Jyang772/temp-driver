@@ -132,6 +132,11 @@ int main( int argc, char **argv) {
      do {
 		write(fd,tempQ,sizeof(tempQ));
 		read(fd,&buffer,BUF_SIZE);
+		//buffer[3] & 0xFF - obtain only least 8 significant bits
+		//buffer[2] << 8   - shift left 8 bits
+		//80021c00 --> 1c00
+		//buffer[3] - 00
+		//buffer[2] - 1c
 		tempc = (buffer[3] & 0xFF) + (buffer[2] << 8);
 		tempc *= (125.0 / 32000.0);
 		tempc = (tempc - subtract);

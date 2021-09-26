@@ -50,7 +50,7 @@
 #include <unistd.h>
 #include <time.h>
 
-#define DEFAULT_DEVICE "/dev/temp0"
+#define DEFAULT_DEVICE "/dev/temp1"
 #define BUF_SIZE 8
 #define DEFAULT_DURATION        800
 #define VERSION "1.0"

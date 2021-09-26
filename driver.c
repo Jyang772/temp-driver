@@ -30,7 +30,7 @@
 #include <linux/ioctl.h>
 #include <linux/delay.h>
 
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 
 #define T_CTRL_BUFFER_SIZE 8
 #define T_CTRL_REQUEST 0x09
@@ -257,8 +257,8 @@ static int t_probe(struct usb_interface *interface, const struct usb_device_id *
 	for(i=0; i< iface_desc->desc.bNumEndpoints;i++) {
 		endpoint = &iface_desc->endpoint[i].desc;
 		
-		if(endpoint->bEndpointAddress == 0x81)
-			return -1;
+		//if(endpoint->bEndpointAddress == 0x81)
+		//	return -1;
 		if(((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN) && 
 			((endpoint->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK) == USB_ENDPOINT_XFER_INT)) 
 			dev->int_in_endpoint = endpoint;

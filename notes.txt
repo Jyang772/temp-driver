@@ -1,0 +1,1 @@
+Remove usbhid driver before loading temp-driver.
